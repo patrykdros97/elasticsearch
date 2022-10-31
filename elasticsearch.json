@@ -5,7 +5,7 @@
     "publisher": "Splunk",
     "type": "siem",
     "main_module": "elasticsearch_connector.py",
-    "app_version": "2.0.6",
+    "app_version": "2.0.6-fdse-1",
     "utctime_updated": "2022-02-17T00:44:05.000000Z",
     "package_name": "phantom_elasticsearch",
     "product_name": "Elasticsearch",
@@ -144,6 +144,96 @@
                     "data_type": "numeric",
                     "example_values": [
                         1
+                    ]
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "modi query",
+            "description": "Run a modify query on mapping on the Elasticsearch installation to . Please escape any quotes that are part of the query string",
+            "verbose": "The action executes the query on an Elasticsearch installation by doing a PUT on the REST endpoint '<b>base_url</b>/<b>index</b>/_mapping' with the input <b>query</b> as the data. Please see the Elasticseach website for query format and documentation.",
+            "type": "investigate",
+            "identifier": "modi_query",
+            "read_only": true,
+            "parameters": {
+                "index": {
+                    "description": "Index to query on",
+                    "data_type": "string",
+                    "order": 0,
+                    "required": true,
+                    "contains": [
+                        "elasticsearch index"
+                    ],
+                    "primary": true
+                },
+                "query": {
+                    "description": "Query to run (in ElasticSearch language)",
+                    "data_type": "string",
+                    "order": 2,
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "elasticsearch query"
+                    ]
+                }
+            },
+            "render": {
+                "type": "json",
+                "width": 10,
+                "height": 5,
+                "view": "elasticsearch_view.display_query_results",
+                "title": "Query Result"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.index",
+                    "data_type": "string",
+                    "contains": [
+                        "elasticsearch index"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties",
+                    "data_type": "string",
+                    "contains": [
+                        "elasticsearch type"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.index",
+                    "data_type": "string",
+                    "contains": [
+                        "elasticsearch index"
+                    ],
+                    "example_values": [
+                        "phantom_index"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.query",
+                    "data_type": "string",
+                    "contains": [
+                        "elasticsearch query"
+                    ],
+                    "example_values": [
+                        "{ \"properties\": {\"test\": {\"type\": \"text\"}}}"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "acknowledged: true",
+                        "acknowledged: false"
                     ]
                 }
             ],

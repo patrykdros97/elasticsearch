@@ -43,6 +43,7 @@ class ElasticsearchConnector(BaseConnector):
     # actions supported by this script
     ACTION_ID_RUN_QUERY = "run_query"
     ACTION_ID_GET_CONFIG = "get_config"
+    ACTION_ID_MODI_QUERY = 'modi_query'
     REQUIRED_INGESTION_FIELDS = ["ingest_index",
                                  "ingest_query"]
 
@@ -213,8 +214,7 @@ class ElasticsearchConnector(BaseConnector):
         except Exception as e:
             return action_result.set_status(phantom.APP_ERROR, "Unable to load query json. Error: {0}".format(str(e)))
 
-        es_type = param.get(ELASTICSEARCH_JSON_TYPE, '_doc')
-        endpoint = "/{0}/{1}/_search".format(param[ELASTICSEARCH_JSON_INDEX], es_type)
+        endpoint = "/{0}/_search".format(param[ELASTICSEARCH_JSON_INDEX])
 
         routing = param.get(ELASTICSEARCH_JSON_ROUTING)
 
@@ -227,7 +227,7 @@ class ElasticsearchConnector(BaseConnector):
         self.save_progress(phantom.APP_PROG_CONNECTING_TO_ELLIPSES, self._host)
 
         # Make the rest endpoint call
-        ret_val, response = self._make_rest_call(endpoint, action_result, data=query_json, params=params, method='post')
+        ret_val, response = self._make_rest_call(endpoint, action_result, data=query_json, params=params, method='get')
 
         # Process errors
         if phantom.is_fail(ret_val):
@@ -241,6 +241,44 @@ class ElasticsearchConnector(BaseConnector):
             ELASTICSEARCH_JSON_TIMED_OUT: response.get('timed_out', False)})
 
         action_result.add_data(response)
+
+        # Set the Status
+        return action_result.set_status(phantom.APP_SUCCESS)
+    
+    def _modi_config(self, param):
+
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        # Connectivity
+        self.save_progress(phantom.APP_PROG_CONNECTING_TO_ELLIPSES, self._host)
+
+        # validate the query that we got
+        query_string = param[ELASTICSEARCH_JSON_QUERY]
+        index = param[ELASTICSEARCH_JSON_INDEX]
+
+        try:
+            query_json = json.loads(query_string)
+        except Exception as e:
+            return action_result.set_status(phantom.APP_ERROR, "Unable to load query json. Error: {0}".format(str(e)))
+
+        # Make the rest endpoint call
+        endpoint = '/{0}/_mapping'.format(index)
+        ret_val, response = self._make_rest_call(endpoint, action_result, data=query_json, method='put')
+        ret_val_get, response_get = self._make_rest_call('/_mapping', action_result, method='get')
+
+        # Process errors
+        if phantom.is_fail(ret_val or ret_val_get):
+            # Dump error messages in the log
+            self.debug_print(action_result.get_message())
+            return action_result.get_status()
+        
+        current_mapping = response_get.get(index, {}).get('mappings', {})
+
+        data = {"index": index}
+        data.update(current_mapping)
+
+        action_result.add_data(data)
+        action_result.update_summary(response)
 
         # Set the Status
         return action_result.set_status(phantom.APP_SUCCESS)
@@ -361,6 +399,8 @@ class ElasticsearchConnector(BaseConnector):
             ret_val = self._run_query(param)
         elif action == self.ACTION_ID_GET_CONFIG:
             ret_val = self._get_config(param)
+        elif action == self.ACTION_ID_MODI_QUERY:
+            ret_val = self._modi_config(param)
         elif action == phantom.ACTION_ID_TEST_ASSET_CONNECTIVITY:
             ret_val = self._test_connectivity(param)
         elif action == phantom.ACTION_ID_INGEST_ON_POLL:
