@@ -214,7 +214,8 @@ class ElasticsearchConnector(BaseConnector):
         except Exception as e:
             return action_result.set_status(phantom.APP_ERROR, "Unable to load query json. Error: {0}".format(str(e)))
 
-        endpoint = "/{0}/_search".format(param[ELASTICSEARCH_JSON_INDEX])
+        es_type = param.get(ELASTICSEARCH_JSON_TYPE, '_doc')
+        endpoint = "/{0}/{1}/_search".format(param[ELASTICSEARCH_JSON_INDEX], es_type)
 
         routing = param.get(ELASTICSEARCH_JSON_ROUTING)
 
@@ -227,7 +228,7 @@ class ElasticsearchConnector(BaseConnector):
         self.save_progress(phantom.APP_PROG_CONNECTING_TO_ELLIPSES, self._host)
 
         # Make the rest endpoint call
-        ret_val, response = self._make_rest_call(endpoint, action_result, data=query_json, params=params, method='get')
+        ret_val, response = self._make_rest_call(endpoint, action_result, data=query_json, params=params, method='post')
 
         # Process errors
         if phantom.is_fail(ret_val):
