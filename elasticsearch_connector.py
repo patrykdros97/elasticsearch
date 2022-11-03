@@ -339,7 +339,7 @@ class ElasticsearchConnector(BaseConnector):
         action_result.update_summary({'total_indices': len(indices)})
 
         # Set the Status
-        return action_result.set_status(phantom.APP_SUCCESS), response
+        return action_result.set_status(phantom.APP_SUCCESS)
 
     def _save_container(self, container_dict):
 
@@ -420,7 +420,7 @@ class ElasticsearchConnector(BaseConnector):
         if action == self.ACTION_ID_RUN_QUERY:
             ret_val = self._run_query(param)
         elif action == self.ACTION_ID_GET_CONFIG:
-            ret_val, __ = self._get_config(param)
+            ret_val = self._get_config(param)
         elif action == self.ACTION_ID_MODIFY_QUERY:
             ret_val = self._modify_config(param)
         elif action == self.ACTION_ID_GET_MAPPING:
