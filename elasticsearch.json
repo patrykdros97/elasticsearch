@@ -150,8 +150,78 @@
             "versions": "EQ(*)"
         },
         {
+            "action": "get mapping",
+            "description": "GET query action on mapping on the Elasticsearch installation to obtain current look for specified index mapping",
+            "verbose": "The action executes the query on an Elasticsearch installation by doing a GET on the REST endpoint '<b>base_url</b>/<b>index</b>/_mapping. Please see the Elasticseach website for query format and documentation.",
+            "type": "investigate",
+            "identifier": "get_mapping",
+            "read_only": true,
+            "parameters": {
+                "index": {
+                    "description": "Index to query on",
+                    "data_type": "string",
+                    "order": 0,
+                    "required": true,
+                    "contains": [
+                        "elasticsearch index"
+                    ],
+                    "primary": true
+                }
+            },
+            "render": {
+                "type": "json",
+                "width": 10,
+                "height": 5,
+                "view": "elasticsearch_view.display_query_results",
+                "title": "Query Result"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.index",
+                    "data_type": "string",
+                    "contains": [
+                        "elasticsearch index"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties",
+                    "data_type": "string",
+                    "contains": [
+                        "elasticsearch type"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.index",
+                    "data_type": "string",
+                    "contains": [
+                        "elasticsearch index"
+                    ],
+                    "example_values": [
+                        "phantom_index"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "acknowledged: true",
+                        "acknowledged: false"
+                    ]
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
             "action": "modify query",
-            "description": "Run a modify query on mapping on the Elasticsearch installation to . Please escape any quotes that are part of the query string",
+            "description": "Run a modify query on mapping on the Elasticsearch installation to add additional field in mapping json. Please escape any quotes that are part of the query string",
             "verbose": "The action executes the query on an Elasticsearch installation by doing a PUT on the REST endpoint '<b>base_url</b>/<b>index</b>/_mapping' with the input <b>query</b> as the data. Please see the Elasticseach website for query format and documentation.",
             "type": "investigate",
             "identifier": "modify_query",
@@ -203,10 +273,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.properties",
-                    "data_type": "string",
-                    "contains": [
-                        "elasticsearch type"
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.parameter.index",

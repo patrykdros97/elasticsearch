@@ -181,3 +181,47 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 
 #### Action Output
 No Output
+
+## action: 'modify query'
+Modifies the selected index mapping with a field specified by the user
+
+Type: **investigate**  
+Read only: **True**
+
+The action executes the query on an Elasticsearch installation by doing a PUT on the REST endpoint '<b>base_url</b>/<b>index</b>/_mapping' with the input <b>query</b> as the data. Please see the Elasticseach website for query format and documentation.
+
+#### Action Parameters
+PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
+--------- | -------- | ----------- | ---- | --------
+**index** |  required  | Index to query on | string |  `elasticsearch index` 
+**query** |  required  | Query to run \(in ElasticSearch language\) | string |  `elasticsearch query` 
+
+#### Action Output
+DATA PATH | TYPE | CONTAINS
+--------- | ---- | --------
+action\_result\.status | string | 
+action\_result\.data\.\*\.index | string |  `elasticsearch index` 
+action\_result\.parameter\.query | string |  `elasticsearch query` 
+action\_result\.parameter\.index | string |  `elasticsearch index`
+action\_result\.message | string |  
+
+## action: 'get mapping'
+GET query action on mapping on the Elasticsearch installation to obtain current look for specified index mapping
+
+Type: **investigate**  
+Read only: **True**
+
+The action executes the query on an Elasticsearch installation by doing a GET on the REST endpoint '<b>base_url</b>/<b>index</b>/_mapping. Please see the Elasticseach website for query format and documentation.
+
+#### Action Parameters
+PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
+--------- | -------- | ----------- | ---- | --------
+**index** |  required  | Index to query on | string |  `elasticsearch index` 
+
+#### Action Output
+DATA PATH | TYPE | CONTAINS
+--------- | ---- | --------
+action\_result\.status | string | 
+action\_result\.data\.\*\.index | string |  `elasticsearch index` 
+action\_result\.data\.\*\.properties | string |  `elasticsearch mapping` 
+action\_result\.message | string | 

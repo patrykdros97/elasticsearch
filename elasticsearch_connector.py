@@ -44,6 +44,7 @@ class ElasticsearchConnector(BaseConnector):
     ACTION_ID_RUN_QUERY = "run_query"
     ACTION_ID_GET_CONFIG = "get_config"
     ACTION_ID_MODIFY_QUERY = 'modify_query'
+    ACTION_ID_GET_MAPPING = 'get_mapping'
     REQUIRED_INGESTION_FIELDS = ["ingest_index",
                                  "ingest_query"]
 
@@ -246,6 +247,35 @@ class ElasticsearchConnector(BaseConnector):
         # Set the Status
         return action_result.set_status(phantom.APP_SUCCESS)
     
+    def _get_mapping(self, param):
+
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        # Connectivity
+        self.save_progress(phantom.APP_PROG_CONNECTING_TO_ELLIPSES, self._host)
+
+        # validate the query that we got
+        index = param[ELASTICSEARCH_JSON_INDEX]
+
+        # Make the rest endpoint call
+        ret_val, response = self._make_rest_call('/_mapping', action_result)
+
+        # Process errors
+        if phantom.is_fail(ret_val):
+            # Dump error messages in the log
+            self.debug_print(action_result.get_message())
+            return action_result.get_status()
+        
+        current_mapping = response.get(index, {}).get('mappings', {})
+
+        data = {"index": index}
+        data.update(current_mapping)
+
+        action_result.add_data(data)
+
+        # Set the Status
+        return action_result.set_status(phantom.APP_SUCCESS)
+    
     def _modify_config(self, param):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
@@ -265,21 +295,12 @@ class ElasticsearchConnector(BaseConnector):
         # Make the rest endpoint call
         endpoint = '/{0}/_mapping'.format(index)
         ret_val, response = self._make_rest_call(endpoint, action_result, data=query_json, method='put')
-        ret_val_get, response_get = self._make_rest_call('/_mapping', action_result, method='get')
 
         # Process errors
-        if phantom.is_fail(ret_val or ret_val_get):
+        if phantom.is_fail(ret_val):
             # Dump error messages in the log
             self.debug_print(action_result.get_message())
             return action_result.get_status()
-        
-        current_mapping = response_get.get(index, {}).get('mappings', {})
-
-        data = {"index": index}
-        data.update(current_mapping)
-
-        action_result.add_data(data)
-        action_result.update_summary(response)
 
         # Set the Status
         return action_result.set_status(phantom.APP_SUCCESS)
@@ -318,7 +339,7 @@ class ElasticsearchConnector(BaseConnector):
         action_result.update_summary({'total_indices': len(indices)})
 
         # Set the Status
-        return action_result.set_status(phantom.APP_SUCCESS)
+        return action_result.set_status(phantom.APP_SUCCESS), response
 
     def _save_container(self, container_dict):
 
@@ -399,9 +420,11 @@ class ElasticsearchConnector(BaseConnector):
         if action == self.ACTION_ID_RUN_QUERY:
             ret_val = self._run_query(param)
         elif action == self.ACTION_ID_GET_CONFIG:
-            ret_val = self._get_config(param)
+            ret_val, __ = self._get_config(param)
         elif action == self.ACTION_ID_MODIFY_QUERY:
             ret_val = self._modify_config(param)
+        elif action == self.ACTION_ID_GET_MAPPING:
+            ret_val = self._get_mapping(param)
         elif action == phantom.ACTION_ID_TEST_ASSET_CONNECTIVITY:
             ret_val = self._test_connectivity(param)
         elif action == phantom.ACTION_ID_INGEST_ON_POLL:
