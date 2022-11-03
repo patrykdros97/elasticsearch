@@ -43,7 +43,7 @@ class ElasticsearchConnector(BaseConnector):
     # actions supported by this script
     ACTION_ID_RUN_QUERY = "run_query"
     ACTION_ID_GET_CONFIG = "get_config"
-    ACTION_ID_MODI_QUERY = 'modi_query'
+    ACTION_ID_MODIFY_QUERY = 'modify_query'
     REQUIRED_INGESTION_FIELDS = ["ingest_index",
                                  "ingest_query"]
 
@@ -245,7 +245,7 @@ class ElasticsearchConnector(BaseConnector):
         # Set the Status
         return action_result.set_status(phantom.APP_SUCCESS)
     
-    def _modi_config(self, param):
+    def _modify_config(self, param):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
@@ -399,8 +399,8 @@ class ElasticsearchConnector(BaseConnector):
             ret_val = self._run_query(param)
         elif action == self.ACTION_ID_GET_CONFIG:
             ret_val = self._get_config(param)
-        elif action == self.ACTION_ID_MODI_QUERY:
-            ret_val = self._modi_config(param)
+        elif action == self.ACTION_ID_MODIFY_QUERY:
+            ret_val = self._modify_config(param)
         elif action == phantom.ACTION_ID_TEST_ASSET_CONNECTIVITY:
             ret_val = self._test_connectivity(param)
         elif action == phantom.ACTION_ID_INGEST_ON_POLL:
