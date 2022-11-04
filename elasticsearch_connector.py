@@ -303,7 +303,7 @@ class ElasticsearchConnector(BaseConnector):
             return action_result.get_status()
 
         # Set the Status
-        return action_result.set_status(phantom.APP_SUCCESS)
+        return action_result.set_status(phantom.APP_SUCCESS, status_message=json.dumps(response))
 
     def _get_config(self, param):
 

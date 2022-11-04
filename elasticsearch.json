@@ -210,11 +210,7 @@
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "acknowledged: true",
-                        "acknowledged: false"
-                    ]
+                    "data_type": "string"
                 }
             ],
             "versions": "EQ(*)"
@@ -299,8 +295,7 @@
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "acknowledged: true",
-                        "acknowledged: false"
+                        "acknowledged: true"
                     ]
                 }
             ],
